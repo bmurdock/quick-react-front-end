@@ -1,172 +1,145 @@
 import React from 'react';
 import TaskForm from './components/TaskForm';
+import ListForm from './components/ListForm';
 import './App.css';
-
-
-
+import Context from './context';
+import { uuid } from './helpers';
 
 class App extends React.Component {
-  constructor()
-  {
-    super();
-    this.state = {
-      tasks: [],
-      taskList: [],
-      editForm: '',
-      listId: '',
-      lists: [],
-      listElements: [],
-      listTasks: [],
-      thingToDisplay: '',
-    }
-  }
+	constructor() {
+		super();
+		this.state = {
+			tasks: [],
+			taskList: [],
+			editForm: '',
+			listId: '',
+			lists: [],
+			listElements: [],
+			listTasks: [],
+			thingToDisplay: ''
+		};
+	}
 
-  getTasks = () =>
-  {
-    fetch('http://localhost:6798/api/tasks')
-    .then((response) =>
-    {
-      return response.json()
-    })
-    .then((data) =>
-    {
-      console.log('data from api: ', data);
-      this.setState({
-        tasks: data,
-        taskList: data.map((item) =>
-        {
-          return <li 
-                    key={item._id}
-                    id={item._id}
-                    onClick={this.updateTask}
-                    >{item.username || "Unknown"}</li>
-        }),
-        editForm: ''
-      })
-    })
-    .catch();
-  }
+	getTasks = () => {
+		fetch('http://localhost:6798/api/tasks')
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				console.log('data from api: ', data);
+				this.setState({
+					tasks: data,
+					taskList: data.map((item) => {
+						return (
+							<li key={item._id} id={item._id} onClick={this.updateTask}>
+								{item.username || 'Unknown'}
+							</li>
+						);
+					}),
+					editForm: ''
+				});
+			})
+			.catch();
+	};
 
-  updateTask = (event) =>
-  {
-    // this is the id of the item i want to update
-    //console.log('all tasks: ', this.state.tasks);
-    const id = event.target.getAttribute('id');
-    const stupidFind = (id) =>
-    {
-      for (let i = 0; i < this.state.tasks.length; i++)
-      {
-        let task = this.state.tasks[i];
-        if (task._id === id)
-        {
-          return task;
-        }
-      }
-      return null;
-    }
+	getLists = () => {
+		fetch('http://localhost:6798/api/lists')
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				console.log('lists from api: ', data);
+				this.setState({
+					lists: data,
+					listElements: data.map((item) => {
+						return (
+							<div>
+								<li key={item._id} id={item._id} onClick={this.updateListDisplay}>
+									{item.name || 'Unknown'}
+								</li>
+								<button className="deleteButton" id={item._id} onClick={this.deleteList}>
+									X
+								</button>
+							</div>
+						);
+					}),
+					editForm: null,
+					thingToDisplay: null
+				});
+			})
+			.catch();
+	};
 
-    let thisTask = stupidFind(id);
-    //thisTask = thisTask[0];
-    //console.log('thisTask: ', thisTask);
-    //console.log('id: ', id);
+	updateListDisplay = (event) => {
+		event.preventDefault();
+		let id = event.target.getAttribute('id');
+		let list = this.state.lists.filter((list) => {
+			return list._id === id;
+		});
+		// because this returns an array and i only want the first one...
+		list = list[0];
+		this.setState(
+			{
+				thingToDisplay: null
+			},
+			function() {
+				this.setState({
+					thingToDisplay: <ListForm key={uuid} {...list} />
+				});
+			}
+		);
+	};
+	deleteList = (event) => {
+		console.log('deleting...');
+		event.preventDefault();
+		let id = event.target.getAttribute('id');
+		console.log('id: ', id);
+		let fetchOptions = {
+			method: 'DELETE'
+		};
+		fetch(`http://localhost:6798/api/lists/${id}`, fetchOptions)
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				console.log('response from api: ', data);
+				this.getLists();
+			})
+			.catch();
+	};
 
-    this.setState({
-      editForm: ''
-    }, function()
-    {
+	componentDidMount() {
+		this.getTasks();
+		this.getLists();
+	}
 
-    });
+	doCreateListThing = (event) => {
+		event.preventDefault();
+		this.setState({
+			thingToDisplay: <ListForm key={uuid()} />
+		});
+	};
 
-
-    return;
-
-  }
-  getLists = () =>
-  {
-    fetch('http://localhost:6798/api/lists')
-    .then((response) =>
-    {
-      return response.json()
-    })
-    .then((data) =>
-    {
-      console.log('data from api: ', data);
-      this.setState({
-        lists: data,
-        listElements: data.map((item) =>
-        {
-          return <li 
-                    key={item._id}
-                    id={item._id}
-                    onClick={this.getListTasks}
-                    >{item.name || "Unknown"}</li>
-        }),
-        editForm: ''
-      })
-    })
-    .catch();
-
-  }
-
-  getListTasks = (event) =>
-  {
-    let listId = event.target.getAttribute('id');
-    let listTasks = this.state.tasks.filter((task) =>
-    {
-      return task.listId && task.listId === listId;
-    });
-    this.setState({
-      listTasks: listTasks.map((item) =>
-      {
-        return <li 
-        key={item._id}
-        id={item._id}
-        onClick={this.updateTask}
-        >{item.name || "Unknown"}</li>
-      })
-    })
-  }
-
-
-  componentDidMount()
-  {
-    this.getTasks();
-    this.getLists();
-  }
-
-  doCreateListThing = (event) =>
-  {
-    event.preventDefault();
-    this.setState({
-      thingToDisplay: <ListForm />,
-    });
-
-  }
-  render()
-  {
-    return (
-      <div className="App">
-        <h2>Things I need to do</h2>
-        <p>Show lists</p>
-        <p onClick={this.doCreateListThing}>Create List</p>
-        <p>Add Item To List</p>
-        <p>Mark List Items Complete</p>
-
-        <h2>Lists</h2>
-        <ul>
-          {this.state.listElements}
-        </ul>
-
-        <h2>Tasks For Your Selected List</h2>
-        <ul>
-          {this.state.listTasks}
-        </ul>
-        <h2>Working Area</h2>
-        {this.state.thingToDisplay}
-      </div>
-    )
-  }
-
+	// This uses a single global context to share the state of the App compontent to everything else
+	// I should be ashamed of myself for doing this
+	render() {
+		return (
+			<div className="App">
+				<Context.Provider value={{ ...this.state, getLists: this.getLists, getTasks: this.getTasks }}>
+					<section className="controls">
+						<section className="buttons">
+							<button onClick={this.doCreateListThing}>Create List</button>
+						</section>
+						<section className="my-lists">
+							<h2>My Lists</h2>
+							<ul>{this.state.listElements}</ul>
+						</section>
+					</section>
+					<section className="content"> {this.state.thingToDisplay}</section>
+				</Context.Provider>
+			</div>
+		);
+	}
 }
 
 export default App;

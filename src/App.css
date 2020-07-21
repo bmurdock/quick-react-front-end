@@ -1,38 +1,58 @@
 .App {
-  text-align: center;
+	display: flex;
+	flex-flow: row no-wrap;
+	margin: 0;
+	padding: 1em;
+}
+.controls {
+	padding: 1em;
+	border: 1px solid red;
+	flex-grow: 1;
+	margin-right: 1em;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.content {
+	padding: 1em;
+	border: 1px solid blue;
+	flex-grow: 3;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.form-field {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	max-width: 20em;
 }
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,600,700);
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* General Buttons */
+button,
+input[type='submit'] {
+	padding: 0.5em 1em;
+	background: linear-gradient(to bottom, #4eb5e5 0%, #389ed5 100%); /* W3C */
+	border: none;
+	border-radius: 5px;
+	position: relative;
+	border-bottom: 4px solid #2b8bc6;
+	color: #fbfbfb;
+	font-weight: 600;
+	font-family: 'Open Sans', sans-serif;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, .4);
+	text-align: center;
+	font-size: 16px;
+	box-shadow: 0px 3px 0px 0px rgba(0, 0, 0, .2);
+	cursor: pointer;
+
+	/* Just for presentation */
 }
-
-.App-link {
-  color: #61dafb;
+button:active {
+	box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, .2);
+	top: 1px;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button.deleteButton {
+	padding: 0 .5em;
+	background: linear-gradient(to bottom, #f00 0%, #900 100%);
+	border-bottom: 1px solid #800;
+	font-size: 12px;
+	box-shadow: none;
 }
