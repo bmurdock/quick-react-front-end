@@ -56,3 +56,21 @@ button.deleteButton {
 	font-size: 12px;
 	box-shadow: none;
 }
+
+button.small, input[type='submit'].small {
+	font-size: 12px;
+	padding: 0.1em .5em;
+}
+.taskRow {
+	display: flex;
+	flex-flow: row wrap;
+	line-height: 1.2em;
+}
+.taskList ul {
+	list-style: none;
+	padding: 0 1em;
+	margin: .2em 0;
+}
+.taskList ul li {
+	margin: .2em;
+}

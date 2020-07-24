@@ -1,5 +1,4 @@
 import React from 'react';
-import TaskForm from './components/TaskForm';
 import ListForm from './components/ListForm';
 import './App.css';
 import Context from './context';
@@ -16,12 +15,12 @@ class App extends React.Component {
 			lists: [],
 			listElements: [],
 			listTasks: [],
-			thingToDisplay: ''
+			thingToDisplay: null,
 		};
 	}
 
-	getTasks = () => {
-		fetch('http://localhost:6798/api/tasks')
+	getTasks = async () => {
+		return await fetch('http://localhost:6798/api/tasks')
 			.then((response) => {
 				return response.json();
 			})
@@ -53,8 +52,8 @@ class App extends React.Component {
 					lists: data,
 					listElements: data.map((item) => {
 						return (
-							<div>
-								<li key={item._id} id={item._id} onClick={this.updateListDisplay}>
+							<div key={item._id}>
+								<li id={item._id} onClick={this.updateListDisplay}>
 									{item.name || 'Unknown'}
 								</li>
 								<button className="deleteButton" id={item._id} onClick={this.deleteList}>
@@ -84,7 +83,7 @@ class App extends React.Component {
 			},
 			function() {
 				this.setState({
-					thingToDisplay: <ListForm key={uuid} {...list} />
+					thingToDisplay: <ListForm key={uuid()} {...list} />
 				});
 			}
 		);
@@ -118,7 +117,9 @@ class App extends React.Component {
 		this.setState({
 			thingToDisplay: <ListForm key={uuid()} />
 		});
-	};
+  };
+  
+
 
 	// This uses a single global context to share the state of the App compontent to everything else
 	// I should be ashamed of myself for doing this

@@ -1,5 +1,7 @@
 import React from 'react';
+import Context from '../context';
 import { uuid } from '../helpers';
+import TaskList from './TaskList';
 
 const TASK_STATUSES = [ 'pending', 'complete' ];
 
@@ -7,6 +9,7 @@ export default class TaskForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+            listId: props.listId || 'error',
 			name: props.name || '',
 			description: props.description || '',
 			due: props.due || '',
@@ -22,27 +25,41 @@ export default class TaskForm extends React.Component {
 
 	handleSubmit = (event) => {
 		event.preventDefault();
-		// and some other stuff
+        // and some other stuff
+        let route = `http://localhost:6798/api/tasks`;
+        let options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(this.state),
+        };
+        fetch(route, options)
+        .then((res) => { return res.json()})
+        .then((data) =>
+        {
+            console.log('should have added a new task: ', data);
+            this.context.getTasks();
+        })
+        .catch((err) =>
+        {
+            console.log('might not have added a new task: ', err);
+        })
 	};
 	render() {
 		return (
 			<form onSubmit={this.handleSubmit}>
-				<div>
-					<label>Name</label>
-					<input name="name" value={this.state.name} onChange={this.changeHandler} />
-				</div>
-				<div>
-					<label>Description</label>
-					<input name="description" value={this.state.description} onChange={this.changeHandler} />
-				</div>
-				<div>
-					<label>Due</label>
-					<input name="due" value={this.state.due} onChange={this.changeHandler} />
-				</div>
-				<div>
-					<input name="status" />
-				</div>
+				<div className="taskRow">
+
+					<input name="name" value={this.state.name} onChange={this.changeHandler} placeholder='Name' />
+
+					<input name="description" value={this.state.description} onChange={this.changeHandler} placeholder='Description' />
+
+					<input name="due" value={this.state.due} onChange={this.changeHandler} placeholder='due' />
+                    <input className="small" type="submit" value="Add Task" />
+                </div>
 			</form>
 		);
 	}
 }
+TaskForm.contextType = Context;

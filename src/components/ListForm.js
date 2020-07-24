@@ -1,6 +1,7 @@
 import React from 'react';
 import Context from '../context';
 import { uuid } from '../helpers';
+import TaskList from './TaskList';
 export default class ListForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -83,10 +84,10 @@ export default class ListForm extends React.Component {
 	};
 	render() {
 		let buttonText = 'Create';
-		let taskButton = null;
+        let taskList = null;
 		if (this.state._id !== 'new') {
 			buttonText = 'Update';
-			taskButton = <button onClick={this.addTask}>Add Task</button>;
+            taskList = <TaskList listId={this.props._id} />
 		}
 		return (
 			<section className="forms-section">
@@ -101,8 +102,7 @@ export default class ListForm extends React.Component {
 					</div>
 					<input type="submit" value={buttonText} />
 				</form>
-				<ul>{this.getListTasks(this.state._id)}</ul>
-				{taskButton}
+                {taskList}
 			</section>
 		);
 	}
